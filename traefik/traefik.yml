@@ -1,0 +1,59 @@
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+log:
+  level: $LOG_LEVEL
+  format: json
+
+accessLog:
+  format: json
+  filePath: ""  # stdout
+
+api:
+  dashboard: true
+  insecure: false
+
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+          permanent: true
+
+  websecure:
+    address: ":443"
+    http:
+      middlewares:
+        - cloudflare-only@file
+      tls:
+        certResolver: cloudflare
+        domains:
+          - main: $DOMAIN
+            sans:
+              - "*.$DOMAIN"
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: traefik_webgateway
+    watch: true
+  file:
+    directory: /etc/traefik/dynamic
+    watch: true
+
+certificatesResolvers:
+  cloudflare:
+    acme:
+      email: $ACME_EMAIL
+      storage: /letsencrypt/acme.json
+      caServer: $ACME_CA_SERVER
+      dnsChallenge:
+        provider: cloudflare
+        resolvers:
+          - "1.1.1.1:53"
+          - "8.8.8.8:53"
