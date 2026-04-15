@@ -32,6 +32,27 @@ services:
       - "traefik.http.middlewares.dashboard-auth.basicauth.users=${DASHBOARD_AUTH}"
       - "traefik.http.routers.dashboard.middlewares=dashboard-auth@docker"
 
+  cf-ip-updater:
+    image: ${CF_IPS_UPDATER_IMAGE:-alpine:3.20}
+    restart: unless-stopped
+    volumes:
+      - ./scripts/update-cf-ips.sh:/usr/local/bin/update-cf-ips.sh:ro
+      - ./traefik/dynamic:/work/traefik/dynamic
+    working_dir: /work
+    environment:
+      - UPDATE_INTERVAL=${CF_IPS_UPDATE_INTERVAL:-7d}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -eu
+        apk add --no-cache bash curl coreutils >/dev/null
+        while true; do
+          echo "[cf-ip-updater] running update at $(date -Iseconds)"
+          bash /usr/local/bin/update-cf-ips.sh || echo "[cf-ip-updater] update failed, keeping previous file"
+          echo "[cf-ip-updater] sleeping ${UPDATE_INTERVAL}"
+          sleep "${UPDATE_INTERVAL}"
+        done
+
 networks:
   traefik_webgateway:
     external: true

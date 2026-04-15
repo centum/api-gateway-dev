@@ -2,3 +2,5 @@
 letsencrypt/acme.json
 *.log
 .DS_Store
+
+.idea/
