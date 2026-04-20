@@ -4,15 +4,14 @@ services:
     restart: unless-stopped
     networks:
       - traefik_webgateway
+    # Mode-agnostic labels: this example works unchanged in both INGRESS_MODE=direct and tunnel.
+    # In direct mode, Traefik terminates TLS via the 'public' entrypoint's http.tls block.
+    # In tunnel mode, CF edge terminates TLS; cloudflared -> Traefik -> service is all HTTP.
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=traefik_webgateway"
       - "traefik.http.routers.whoami.rule=Host(`whoami.${DOMAIN}`)"
-      - "traefik.http.routers.whoami.entrypoints=websecure"
-      - "traefik.http.routers.whoami.tls=true"
-      - "traefik.http.routers.whoami.tls.certresolver=cloudflare"
-      - "traefik.http.routers.whoami.tls.domains[0].main=${DOMAIN}"
-      - "traefik.http.routers.whoami.tls.domains[0].sans=*.${DOMAIN}"
+      - "traefik.http.routers.whoami.entrypoints=public"
       - "traefik.http.services.whoami.loadbalancer.server.port=80"
 
 networks:
