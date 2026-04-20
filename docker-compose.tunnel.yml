@@ -1,0 +1,11 @@
+# Overlay applied in tunnel mode (INGRESS_MODE=tunnel).
+# Included via `docker compose -f docker-compose.yml -f docker-compose.tunnel.yml`.
+# The Makefile adds this flag automatically when INGRESS_MODE=tunnel.
+#
+# Purpose: remove host port binding for traefik — in tunnel mode, cloudflared
+# reaches traefik over the internal docker network, so 80/443 must NOT be
+# exposed on the host.
+
+services:
+  traefik:
+    ports: !reset []

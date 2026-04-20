@@ -1,0 +1,33 @@
+# Used when INGRESS_MODE=tunnel.
+# Plain HTTP on :80, TLS terminates at CF edge.
+# No ACME, no IP allowlist, no HTTP->HTTPS redirect (CF handles it).
+
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+log:
+  level: $LOG_LEVEL
+  format: json
+
+accessLog:
+  format: json
+  filePath: ""  # stdout
+
+api:
+  dashboard: true
+  insecure: false
+
+entryPoints:
+  public:
+    address: ":80"
+
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
+    network: traefik_webgateway
+    watch: true
+  file:
+    directory: /etc/traefik/dynamic
+    watch: true

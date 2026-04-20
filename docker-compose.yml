@@ -7,15 +7,15 @@ services:
       - "${HTTPS_PORT:-443}:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./traefik/traefik.direct.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/traefik.${INGRESS_MODE:-direct}.yml:/etc/traefik/traefik.yml:ro
       - ./traefik/dynamic:/etc/traefik/dynamic:ro
       - ./letsencrypt:/letsencrypt
     environment:
-      - CF_DNS_API_TOKEN=${CF_DNS_API_TOKEN}
+      - CF_DNS_API_TOKEN=${CF_DNS_API_TOKEN:-}
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - DOMAIN=${DOMAIN}
-      - ACME_EMAIL=${ACME_EMAIL}
-      - ACME_CA_SERVER=${ACME_CA_SERVER}
+      - ACME_EMAIL=${ACME_EMAIL:-}
+      - ACME_CA_SERVER=${ACME_CA_SERVER:-}
       - DASHBOARD_AUTH=${DASHBOARD_AUTH}
     networks:
       - traefik_webgateway
@@ -29,6 +29,7 @@ services:
       - "traefik.http.routers.dashboard.middlewares=dashboard-auth@docker"
 
   cf-ip-updater:
+    profiles: ["direct"]
     image: ${CF_IPS_UPDATER_IMAGE:-alpine:3.20}
     restart: unless-stopped
     volumes:
@@ -48,6 +49,16 @@ services:
           echo "[cf-ip-updater] sleeping ${UPDATE_INTERVAL}"
           sleep "${UPDATE_INTERVAL}"
         done
+
+  cloudflared:
+    profiles: ["tunnel"]
+    image: cloudflare/cloudflared:${CLOUDFLARED_IMAGE_TAG:-latest}
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
+    networks:
+      - traefik_webgateway
+    depends_on:
+      - traefik
 
 networks:
   traefik_webgateway:
