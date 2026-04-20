@@ -7,7 +7,7 @@ services:
       - "${HTTPS_PORT:-443}:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./traefik/traefik.direct.yml:/etc/traefik/traefik.yml:ro
       - ./traefik/dynamic:/etc/traefik/dynamic:ro
       - ./letsencrypt:/letsencrypt
     environment:
@@ -23,11 +23,7 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=${NETWORK_NAME:-traefik_webgateway}"
       - "traefik.http.routers.dashboard.rule=Host(`${DASHBOARD_SUBDOMAIN:-traefik}.${DOMAIN}`)"
-      - "traefik.http.routers.dashboard.entrypoints=websecure"
-      - "traefik.http.routers.dashboard.tls=true"
-      - "traefik.http.routers.dashboard.tls.certresolver=cloudflare"
-      - "traefik.http.routers.dashboard.tls.domains[0].main=${DOMAIN}"
-      - "traefik.http.routers.dashboard.tls.domains[0].sans=*.${DOMAIN}"
+      - "traefik.http.routers.dashboard.entrypoints=public"
       - "traefik.http.routers.dashboard.service=api@internal"
       - "traefik.http.middlewares.dashboard-auth.basicauth.users=${DASHBOARD_AUTH}"
       - "traefik.http.routers.dashboard.middlewares=dashboard-auth@docker"

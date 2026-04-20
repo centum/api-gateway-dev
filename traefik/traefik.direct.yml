@@ -20,11 +20,11 @@ entryPoints:
     http:
       redirections:
         entryPoint:
-          to: websecure
+          to: public
           scheme: https
           permanent: true
 
-  websecure:
+  public:
     address: ":443"
     http:
       middlewares:
