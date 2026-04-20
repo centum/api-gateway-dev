@@ -245,3 +245,7 @@ grep "cloudflare-only" traefik/traefik.direct.yml traefik/dynamic/cloudflare-ips
 ```
 
 All three lines must show the same name.
+
+## License
+
+MIT
