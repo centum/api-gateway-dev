@@ -7,7 +7,7 @@ log:
   format: text
 
 accessLog:
-  format: json
+  format: text
   filePath: "" # stdout
 
 api:
