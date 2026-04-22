@@ -3,12 +3,12 @@ global:
   sendAnonymousUsage: false
 
 log:
-  level: $LOG_LEVEL
-  format: json
+  level: INFO
+  format: text
 
 accessLog:
   format: json
-  filePath: ""  # stdout
+  filePath: "" # stdout
 
 api:
   dashboard: true

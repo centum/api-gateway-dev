@@ -60,7 +60,7 @@ cp .env.example .env
 #   INGRESS_MODE=direct (default), COMPOSE_PROFILES=direct
 #   DOMAIN, ACME_EMAIL, CF_DNS_API_TOKEN, DASHBOARD_AUTH
 # Optional overrides (defaults shown):
-#   LOG_LEVEL=INFO  HTTP_PORT=80  HTTPS_PORT=443  NETWORK_NAME=traefik_webgateway
+#   HTTP_PORT=80  HTTPS_PORT=443  NETWORK_NAME=traefik_webgateway
 
 # 2. Generate DASHBOARD_AUTH (bcrypt)
 # The sed replaces $ with $$ — required by docker compose for literal $ in values.
